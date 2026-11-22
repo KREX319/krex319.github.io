@@ -1,1 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Вход и регистрация</title>
+<style>
+:root{
+  --bg:#eef2f1;--surface:#ffffff;--text:#16211f;--muted:#5d6b68;--line:#d3dcda;
+  --accent:#0f766e;--accent-text:#ffffff;--err:#b42318;--ok:#18794e;--field:#f7faf9;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101716;--surface:#18211f;--text:#e8f0ee;--muted:#9bada9;--line:#2c3a37;
+    --accent:#2dd4bf;--accent-text:#06201c;--err:#ff8a80;--ok:#6ee7a8;--field:#121a18;
+    color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:var(--bg);color:var(--text);
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+.card{
+  width:100%;max-width:400px;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:28px 24px;
+}
+h1{margin:0 0 4px;font-size:1.5rem;letter-spacing:-.01em}
+.sub{margin:0 0 20px;color:var(--muted);font-size:.95rem}
+.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);margin-bottom:22px}
+.tab{
+  background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+  padding:10px 0;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;
+}
+.tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+label{display:block;font-size:.9rem;font-weight:600;margin:14px 0 6px}
+.field{position:relative}
+input{
+  width:100%;padding:11px 12px;font:inherit;color:var(--text);
+  background:var(--field);border:1px solid var(--line);border-radius:8px;
+}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.field input{padding-right:84px}
+.toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;
+  padding:6px 8px;cursor:pointer;border-radius:6px;
+}
+.hint{font-size:.82rem;color:var(--muted);margin:6px 0 0}
+.msg{min-height:1.3em;margin:14px 0 0;font-size:.9rem}
+.msg.err{color:var(--err)}.msg.ok{color:var(--ok)}
+.btn{
+  width:100%;margin-top:10px;padding:12px;font:inherit;font-weight:600;
+  background:var(--accent);color:var(--accent-text);border:0;border-radius:8px;cursor:pointer;
+}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.ghost{background:none;color:var(--text);border:1px solid var(--line)}
+.profile dl{margin:18px 0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px}
+.profile dt{color:var(--muted)}.profile dd{margin:0;font-weight:600;word-break:break-all}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="card">
 
+  <section id="auth">
+    <h1>Добро пожаловать</h1>
+    <p class="sub">Войдите или создайте новый аккаунт.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-login" aria-selected="true" aria-controls="form-login">Вход</button>
+      <button class="tab" role="tab" id="tab-reg" aria-selected="false" aria-controls="form-reg">Регистрация</button>
+    </div>
+
+    <div id="form-login" role="tabpanel">
+      <label for="l-user">Имя пользователя</label>
+      <input id="l-user" autocomplete="username" autocapitalize="none">
+      <label for="l-pass">Пароль</label>
+      <div class="field">
+        <input id="l-pass" type="password" autocomplete="current-password">
+        <button type="button" class="toggle" data-for="l-pass">Показать</button>
+      </div>
+      <button class="btn" id="btn-login">Войти</button>
+    </div>
+
+    <div id="form-reg" role="tabpanel" hidden>
+      <label for="r-user">Имя пользователя</label>
+      <input id="r-user" autocomplete="username" autocapitalize="none">
+      <p class="hint">От 3 до 20 символов: буквы, цифры, _ и -</p>
+      <label for="r-pass">Пароль</label>
+      <div class="field">
+        <input id="r-pass" type="password" autocomplete="new-password">
+        <button type="button" class="toggle" data-for="r-pass">Показать</button>
+      </div>
+      <p class="hint">Минимум 6 символов</p>
+      <label for="r-pass2">Повторите пароль</label>
+      <div class="field">
+        <input id="r-pass2" type="password" autocomplete="new-password">
+        <button type="button" class="toggle" data-for="r-pass2">Показать</button>
+      </div>
+      <button class="btn" id="btn-reg">Создать аккаунт</button>
+    </div>
+
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="profile" class="profile" hidden>
+    <h1>Привет, <span id="p-name"></span>!</h1>
+    <p class="sub">Вы успешно вошли в систему.</p>
+    <dl>
+      <dt>Имя</dt><dd id="p-user"></dd>
+      <dt>Дата регистрации</dt><dd id="p-date"></dd>
+    </dl>
+    <button class="btn ghost" id="btn-logout">Выйти</button>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+
+  var mem = {};
+  function load(key, fallback){
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return key in mem ? mem[key] : fallback; }
+  }
+  function save(key, val){
+    mem[key] = val;
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+  }
+  function drop(key){
+    delete mem[key];
+    try { localStorage.removeItem(key); } catch(e){}
+  }
+
+  async function hash(pass, salt){
+    var data = new TextEncoder().encode(salt + ':' + pass);
+    if (window.crypto && crypto.subtle){
+      var buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map(function(b){
+        return b.toString(16).padStart(2,'0');
+      }).join('');
+    }
+    var h = 5381;
+    for (var i = 0; i < data.length; i++) h = ((h << 5) + h + data[i]) >>> 0;
+    return 'f' + h.toString(16);
+  }
+  function makeSalt(){
+    var a = new Uint8Array(12);
+    (window.crypto || {getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.random()*256;}}).getRandomValues(a);
+    return Array.from(a).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+
+  function say(text, kind){
+    var m = $('msg');
+    m.textContent = text || '';
+    m.className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  function showTab(name){
+    var login = name === 'login';
+    $('form-login').hidden = !login;
+    $('form-reg').hidden = login;
+    $('tab-login').setAttribute('aria-selected', login);
+    $('tab-reg').setAttribute('aria-selected', !login);
+    say('');
+  }
+  $('tab-login').onclick = function(){ showTab('login'); };
+  $('tab-reg').onclick = function(){ showTab('reg'); };
+
+  document.querySelectorAll('.toggle').forEach(function(btn){
+    btn.onclick = function(){
+      var inp = $(btn.dataset.for);
+      var show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.textContent = show ? 'Скрыть' : 'Показать';
+    };
+  });
+
+  function showProfile(name){
+    var users = load('users', {});
+    var u = users[name.toLowerCase()];
+    $('p-name').textContent = name;
+    $('p-user').textContent = name;
+    $('p-date').textContent = u && u.created
+      ? new Date(u.created).toLocaleDateString('ru-RU') : '—';
+    $('auth').hidden = true;
+    $('profile').hidden = false;
+  }
+  function showAuth(){
+    $('profile').hidden = true;
+    $('auth').hidden = false;
+    $('l-pass').value = '';
+    showTab('login');
+  }
+
+  async function register(){
+    var name = $('r-user').value.trim();
+    var p1 = $('r-pass').value, p2 = $('r-pass2').value;
+    if (!/^[A-Za-z0-9_-]{3,20}$/.test(name))
+      return say('Имя должно быть от 3 до 20 символов: латинские буквы, цифры, _ или -.', 'err');
+    if (p1.length < 6)
+      return say('Пароль слишком короткий: нужно минимум 6 символов.', 'err');
+    if (p1 !== p2)
+      return say('Пароли не совпадают. Введите их ещё раз.', 'err');
+
+    var users = load('users', {});
+    var key = name.toLowerCase();
+    if (users[key])
+      return say('Такое имя уже занято. Выберите другое.', 'err');
+
+    var btn = $('btn-reg'); btn.disabled = true;
+    var salt = makeSalt();
+    users[key] = { name: name, salt: salt, hash: await hash(p1, salt), created: Date.now() };
+    save('users', users);
+    btn.disabled = false;
+
+    $('r-user').value = $('r-pass').value = $('r-pass2').value = '';
+    showTab('login');
+    $('l-user').value = name;
+    say('Аккаунт создан. Теперь войдите.', 'ok');
+    $('l-pass').focus();
+  }
+
+  async function login(){
+    var name = $('l-user').value.trim();
+    var pass = $('l-pass').value;
+    if (!name || !pass)
+      return say('Введите имя пользователя и пароль.', 'err');
+
+    var users = load('users', {});
+    var u = users[name.toLowerCase()];
+    var btn = $('btn-login'); btn.disabled = true;
+    var ok = u && (await hash(pass, u.salt)) === u.hash;
+    btn.disabled = false;
+
+    if (!ok) return say('Неверное имя пользователя или пароль.', 'err');
+    save('session', u.name);
+    say('');
+    showProfile(u.name);
+  }
+
+  $('btn-reg').onclick = register;
+  $('btn-login').onclick = login;
+  $('btn-logout').onclick = function(){ drop('session'); showAuth(); };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter') return;
+    if (!$('form-login').hidden && $('auth').contains(e.target)) login();
+    else if (!$('form-reg').hidden && $('auth').contains(e.target)) register();
+  });
+
+  var current = load('session', null);
+  if (current && load('users', {})[String(current).toLowerCase()]) showProfile(current);
+})();
+</script>
+</body>
+</html>
